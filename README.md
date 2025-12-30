@@ -1,4 +1,4 @@
-# legal-advisor
+# legal- Right Advisor: Automated Evaluation of AI Legal Rights with Zero-Shot Classification and Rule Logic
 
 ## **Overview**
 **LegalAI Evaluator** is an automated system that assesses artificial intelligence systems against legal frameworks using zero-shot classification and rule-based logic. The platform analyzes AI documentation to determine eligibility for legal rights, protections, and compliance requirements across multiple jurisdictions.
