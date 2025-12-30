@@ -38,8 +38,6 @@
 4. Push to branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
-
 ## **📄 License**
 
 This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
