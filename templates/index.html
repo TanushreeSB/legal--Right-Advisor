@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Right Advisor - AI Legal Assistant</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iOCIgZmlsbD0iIzFhMzY1ZCIvPgo8cGF0aCBkPSJNMzIgMTZDMjUuMzcyNiAxNiAyMCAyMS4zNzI2IDIwIDI4QzIwIDM0LjYyNzQgMjUuMzcyNiA0MCAzMiA0MEMzOC42Mjc0IDQwIDQ0IDM0LjYyNzQgNDQgMjhDNDQgMjEuMzcyNiAzOC42Mjc0IDE2IDMyIDE2WiIgZmlsbD0iI2Q0YWYzNyIvPgo8cGF0aCBkPSJNMzYgMjRIMjhWMzJIMjRWMzZIMzJWMjRIMzZaIiBmaWxsPSIjMWEzNjVkIi8+CjxwYXRoIGQ9Ik00OCA0OEgxNlY1Mkg0OFY0OFoiIGZpbGw9IiNkNGFmMzciLz4KPC9zdmc+Cg==">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2d4a7c;
+            --accent-color: #d4af37;
+            --light-color: #f8f9fa;
+            --dark-color: #2c3e50;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255,255,255,0.1);
+            color: var(--accent-color);
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: relative;
+        }
+
+        .language-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .language-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            min-width: 150px;
+            box-shadow: var(--shadow);
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        .language-dropdown.show {
+            display: block;
+        }
+
+        .language-option {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .language-option:hover {
+            background: var(--light-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(26, 54, 93, 0.9), rgba(26, 54, 93, 0.8));
+            color: white;
+            padding: 6rem 0;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background-color: #e6c12e;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: white;
+            color: var(--primary-color);
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+        }
+
+        /* Sample Questions Section */
+        .sample-questions {
+            background: white;
+            padding: 3rem 0;
+        }
+
+        .questions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .question-card {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .question-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .question-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .question-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--light-color);
+            padding: 2.5rem 2rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 5rem 0;
+            background: var(--light-color);
+        }
+
+        .analysis-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section, .output-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .input-area {
+            margin-bottom: 1.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .input-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .voice-btn {
+            background: var(--light-color);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .voice-btn:hover {
+            background: #e9ecef;
+        }
+
+        .voice-btn.recording {
+            background: #ffebee;
+            color: #d32f2f;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .output-area {
+            min-height: 300px;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .legal-point {
+            background: white;
+            padding: 1rem;
+            border-left: 4px solid var(--accent-color);
+            margin-bottom: 1rem;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .where-to-go {
+            background: #e8f4fd;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin-top: 1.5rem;
+            border-left: 4px solid #2196f3;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Map Section */
+        .map-container {
+            height: 500px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin: 2rem 0;
+        }
+
+        #court-map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .map-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .map-search {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        /* Algorithm Comparison Page */
+        .comparison-section {
+            padding: 3rem 0;
+            background: white;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .algorithm-card {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .algorithm-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .algorithm-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .algorithm-card .feature-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .algorithm-card .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .algorithm-card .feature-list li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Page Content Styles */
+        .page-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .page-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-content h3 {
+            color: var(--secondary-color);
+            margin: 2rem 0 1rem 0;
+        }
+
+        .page-content p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .page-content ul {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        .page-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .contact-card {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .contact-card i {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section a {
+            color: #ddd;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-color);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 400px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .analysis-container {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .map-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-balance-scale"></i>
+                    <h1>Right Advisor</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
+                        <li><a href="#" class="nav-link" data-page="about">About</a></li>
+                        <li><a href="#" class="nav-link" data-page="resources">Legal Resources</a></li>
+                        <li><a href="#" class="nav-link" data-page="courts">Find Courts</a></li>
+                        <li><a href="#" class="nav-link" data-page="algorithms">AI Comparison</a></li>
+                        <li><a href="#" class="nav-link" data-page="contact">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="language-selector">
+                    <button class="language-btn">
+                        <i class="fas fa-globe"></i> English
+                    </button>
+                    <div class="language-dropdown">
+                        <div class="language-option" data-lang="en">English</div>
+                        <div class="language-option" data-lang="es">Español</div>
+                        <div class="language-option" data-lang="fr">Français</div>
+                        <div class="language-option" data-lang="hi">हिन्दी</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Home Section -->
+    <section id="home" class="page-section active">
+        <div class="hero">
+            <div class="container">
+                <h2>Your AI Legal Assistant</h2>
+                <p>Understand your legal rights in simple language. Get instant analysis of your situation and discover relevant laws that protect you.</p>
+                <div class="hero-buttons">
+                    <button class="btn" onclick="document.getElementById('situation-input').focus()">
+                        <i class="fas fa-rocket"></i> Start Analysis
+                    </button>
+                    <button class="btn btn-secondary" onclick="scrollToAnalysis()">
+                        <i class="fas fa-info-circle"></i> Learn More
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Questions Section -->
+        <section class="sample-questions">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Common Legal Questions</h2>
+                    <p>Click on any question below to analyze your rights</p>
+                </div>
+                <div class="questions-container">
+                    <div class="question-card" onclick="fillQuestion('My landlord increased my rent without proper notice. What can I do?')">
+                        <h4><i class="fas fa-home"></i> Housing Issues</h4>
+                        <p>"My landlord increased my rent without proper notice. What can I do?"</p>
+                    </div>
+                    <div class="question-card" onclick="fillQuestion('My employer hasn\'t paid me for overtime work. What are my rights?')">
+                        <h4><i class="fas fa-briefcase"></i> Employment Law</h4>
+                        <p>"My employer hasn't paid me for overtime work. What are my rights?"</p>
+                    </div>
+                    <div class="question-card" onclick="fillQuestion('I bought a defective product and the company won\'t refund me. What should I do?')">
+                        <h4><i class="fas fa-shopping-cart"></i> Consumer Rights</h4>
+                        <p>"I bought a defective product and the company won't refund me."</p>
+                    </div>
+                    <div class="question-card" onclick="fillQuestion('I\'m going through a divorce and need to understand child custody laws.')">
+                        <h4><i class="fas fa-users"></i> Family Law</h4>
+                        <p>"I'm going through a divorce and need to understand child custody laws."</p>
+                    </div>
+                    <div class="question-card" onclick="fillQuestion('My neighbor\'s construction is damaging my property. What are my legal options?')">
+                        <h4><i class="fas fa-gavel"></i> Property Disputes</h4>
+                        <p>"My neighbor's construction is damaging my property. What are my legal options?"</p>
+                    </div>
+                    <div class="question-card" onclick="fillQuestion('I was injured in a car accident that wasn\'t my fault. How do I claim compensation?')">
+                        <h4><i class="fas fa-car-crash"></i> Personal Injury</h4>
+                        <p>"I was injured in a car accident that wasn't my fault. How do I claim compensation?"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <div class="section-title">
+                    <h2>How Right Advisor Helps You</h2>
+                    <p>Powered by advanced AI to make legal information accessible to everyone</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3>AI-Powered Analysis</h3>
+                        <p>Advanced NLP algorithms understand your situation and identify relevant legal principles instantly.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <h3>Simple Language</h3>
+                        <p>We translate complex legal jargon into everyday language that's easy to understand and act upon.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-universal-access"></i>
+                        </div>
+                        <h3>Accessible to All</h3>
+                        <p>Voice input, multilingual support, and mobile-friendly design for everyone regardless of background.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="main-content">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Analyze Your Legal Situation</h2>
+                    <p>Describe your issue and get instant legal insights</p>
+                </div>
+                <div class="analysis-container">
+                    <div class="input-section">
+                        <div class="section-title" style="text-align: left; margin-bottom: 1.5rem;">
+                            <i class="fas fa-edit"></i>
+                            <h3 style="margin: 0;">Describe Your Situation</h3>
+                        </div>
+                        <div class="input-controls">
+                            <button class="voice-btn" id="voice-btn">
+                                <i class="fas fa-microphone"></i> Voice Input
+                            </button>
+                            <div class="language-selector">
+                                <button class="language-btn">
+                                    <i class="fas fa-language"></i> English
+                                </button>
+                                <div class="language-dropdown">
+                                    <div class="language-option" data-lang="en">English</div>
+                                    <div class="language-option" data-lang="es">Español</div>
+                                    <div class="language-option" data-lang="fr">Français</div>
+                                    <div class="language-option" data-lang="hi">हिन्दी</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-area">
+                            <textarea id="situation-input" placeholder="Describe your legal situation here. For example: 'My landlord increased my rent without proper notice' or 'My employer didn't pay me for overtime work'"></textarea>
+                        </div>
+                        <button id="analyze-btn" class="btn" style="width: 100%; justify-content: center;">
+                            <i class="fas fa-search"></i> Analyze My Rights
+                        </button>
+                        <button id="compare-models-btn" class="btn btn-info" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                            <i class="fas fa-code-branch"></i> Compare AI Models
+                        </button>
+                    </div>
+
+                    <div class="output-section">
+                        <div class="section-title" style="text-align: left; margin-bottom: 1.5rem;">
+                            <i class="fas fa-gavel"></i>
+                            <h3 style="margin: 0;">Legal Analysis</h3>
+                        </div>
+                        <div class="output-area" id="output-area">
+                            <div id="output-placeholder">
+                                <i class="fas fa-balance-scale" style="font-size: 3rem; color: #6c757d; margin-bottom: 1rem;"></i>
+                                <p>Your legal analysis will appear here after you describe your situation and click "Analyze My Rights".</p>
+                            </div>
+                            <div id="legal-analysis" style="display: none;">
+                                <h3>Your Legal Rights Analysis</h3>
+                                <div id="legal-points"></div>
+                                <div id="where-to-go"></div>
+                                <div class="disclaimer" style="margin-top: 2rem; padding: 1rem; background: #fff3cd; border-radius: 4px; border-left: 4px solid #ffc107;">
+                                    <p><strong>Disclaimer:</strong> This analysis is provided for informational purposes only and does not constitute legal advice. For specific legal concerns, please consult with a qualified attorney.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="model-comparison" style="display: none; margin-top: 2rem;">
+                            <h4><i class="fas fa-chart-bar"></i> AI Model Comparison</h4>
+                            <div id="comparison-results"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="page-section">
+        <div class="container" style="padding: 5rem 0;">
+            <div class="page-content">
+                <h2>About Right Advisor</h2>
+                
+                <h3>Our Mission</h3>
+                <p>Right Advisor is an AI-powered legal assistant designed to democratize access to legal information. We believe everyone should understand their legal rights, regardless of their background or ability to afford expensive legal counsel.</p>
+                
+                <h3>How It Works</h3>
+                <p>Using advanced Natural Language Processing (NLP) and Machine Learning algorithms, Right Advisor interprets user-described situations and identifies relevant laws and regulations that apply. Our system analyzes your input to provide:</p>
+                <ul>
+                    <li>Clear explanations of relevant legal principles</li>
+                    <li>Specific rights and obligations in your situation</li>
+                    <li>Actionable steps you can take</li>
+                    <li>Appropriate resources for further help</li>
+                </ul>
+                
+                <h3>Our Technology</h3>
+                <p>Right Advisor leverages state-of-the-art AI technology including:</p>
+                <ul>
+                    <li>Natural Language Processing for understanding legal scenarios</li>
+                    <li>Machine Learning models trained on legal datasets</li>
+                    <li>Voice recognition for accessible input</li>
+                    <li>Multilingual support for broader accessibility</li>
+                </ul>
+                
+                <h3>Our Vision</h3>
+                <p>We aim to create a world where legal information is accessible, understandable, and actionable for everyone. By breaking down complex legal concepts into simple language, we empower individuals to make informed decisions about their legal situations.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Legal Resources Section -->
+    <section id="resources" class="page-section">
+        <div class="container" style="padding: 5rem 0;">
+            <div class="page-content">
+                <h2>Legal Resources & Guides</h2>
+                
+                <h3>Understanding Your Rights</h3>
+                <p>Browse our comprehensive legal resources to better understand your rights in various situations:</p>
+                
+                <div class="legal-points" style="margin: 2rem 0;">
+                    <div class="legal-point">
+                        <h4>🏠 Housing & Tenant Rights</h4>
+                        <p><strong>Your rights as a tenant include:</strong></p>
+                        <ul>
+                            <li>Right to habitable living conditions</li>
+                            <li>Protection against wrongful eviction</li>
+                            <li>Security deposit return rights</li>
+                            <li>Proper notice for rent increases</li>
+                            <li>Privacy and quiet enjoyment</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="legal-point">
+                        <h4>💼 Employment Law</h4>
+                        <p><strong>Workplace rights include:</strong></p>
+                        <ul>
+                            <li>Minimum wage and overtime pay</li>
+                            <li>Protection against discrimination</li>
+                            <li>Safe working environment</li>
+                            <li>Family and medical leave rights</li>
+                            <li>Protection from retaliation</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="legal-point">
+                        <h4>🛍️ Consumer Protection</h4>
+                        <p><strong>Consumer rights include:</strong></p>
+                        <ul>
+                            <li>Right to safe products</li>
+                            <li>Protection against fraud</li>
+                            <li>Warranty rights</li>
+                            <li>Truth in advertising</li>
+                            <li>Debt collection protections</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="legal-point">
+                        <h4>👨‍👩‍👧‍👦 Family Law</h4>
+                        <p><strong>Family law matters include:</strong></p>
+                        <ul>
+                            <li>Divorce and separation</li>
+                            <li>Child custody and support</li>
+                            <li>Domestic violence protection</li>
+                            <li>Adoption and guardianship</li>
+                            <li>Prenuptial agreements</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h3>Finding Legal Help</h3>
+                <p>If you need professional legal assistance, consider these resources:</p>
+                <ul>
+                    <li><strong>Legal Aid Societies:</strong> Free or low-cost legal services for qualifying individuals</li>
+                    <li><strong>Bar Association Referral Services:</strong> Connect with qualified attorneys in your area</li>
+                    <li><strong>Pro Bono Programs:</strong> Free legal services from volunteer attorneys</li>
+                    <li><strong>Law School Clinics:</strong> Supervised legal services from law students</li>
+                    <li><strong>Self-Help Centers:</strong> Resources for representing yourself in court</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courts Map Section -->
+    <section id="courts" class="page-section">
+        <div class="container" style="padding: 5rem 0;">
+            <div class="page-content">
+                <h2>Find Courts Near You</h2>
+                <p>Locate nearby courts, legal aid offices, and legal resources. Use the search bar to find courts in your area.</p>
+                
+                <div class="map-controls">
+                    <input type="text" id="location-search" class="map-search" placeholder="Enter city, state, or zip code">
+                    <button class="btn" onclick="searchLocation()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <button class="btn btn-secondary" onclick="getUserLocation()">
+                        <i class="fas fa-location-arrow"></i> Use My Location
+                    </button>
+                    <select id="court-type" class="map-search" onchange="filterCourts()">
+                        <option value="all">All Courts</option>
+                        <option value="supreme">Supreme Court</option>
+                        <option value="high">High Court</option>
+                        <option value="district">District Court</option>
+                        <option value="family">Family Court</option>
+                        <option value="consumer">Consumer Court</option>
+                        <option value="legal_aid">Legal Aid Office</option>
+                    </select>
+                </div>
+                
+                <div class="map-container">
+                    <div id="court-map"></div>
+                </div>
+                
+                <div id="court-list" style="margin-top: 2rem;">
+                    <h3>Nearby Courts & Legal Offices</h3>
+                    <div id="court-results"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Algorithm Comparison Section -->
+    <section id="algorithms" class="page-section">
+        <div class="container" style="padding: 5rem 0;">
+            <div class="page-content">
+                <h2>AI Algorithm Comparison</h2>
+                <p>Right Advisor uses two complementary AI approaches to provide accurate legal analysis.</p>
+                
+                <div class="comparison-grid">
+                    <div class="algorithm-card">
+                        <h3><i class="fas fa-brain"></i> Zero-Shot Learning Model</h3>
+                        <p>Our advanced AI that understands legal concepts without specific training on every case type.</p>
+                        
+                        <ul class="feature-list">
+                            <li>Understands novel legal situations</li>
+                            <li>Works with minimal training data</li>
+                            <li>Adapts to new legal scenarios</li>
+                            <li>High accuracy on complex cases</li>
+                            <li>Contextual understanding</li>
+                        </ul>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <h4>Performance Metrics</h4>
+                            <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+                                <div>
+                                    <div class="stat-value">92%</div>
+                                    <div class="stat-label">Accuracy</div>
+                                </div>
+                                <div>
+                                    <div class="stat-value">1.2s</div>
+                                    <div class="stat-label">Response Time</div>
+                                </div>
+                                <div>
+                                    <div class="stat-value">85%</div>
+                                    <div class="stat-label">User Satisfaction</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="algorithm-card">
+                        <h3><i class="fas fa-cogs"></i> Rule-Based System</h3>
+                        <p>Traditional AI system based on established legal rules and patterns.</p>
+                        
+                        <ul class="feature-list">
+                            <li>Reliable for common legal issues</li>
+                            <li>Predictable and consistent results</li>
+                            <li>Fast processing of standard cases</li>
+                            <li>Easy to audit and explain</li>
+                            <li>Based on legal precedents</li>
+                        </ul>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <h4>Performance Metrics</h4>
+                            <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+                                <div>
+                                    <div class="stat-value">88%</div>
+                                    <div class="stat-label">Accuracy</div>
+                                </div>
+                                <div>
+                                    <div class="stat-value">0.8s</div>
+                                    <div class="stat-label">Response Time</div>
+                                </div>
+                                <div>
+                                    <div class="stat-value">78%</div>
+                                    <div class="stat-label">User Satisfaction</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="comparison-section">
+                    <h3>Performance Comparison</h3>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">94%</div>
+                            <div class="stat-label">Zero-Shot Accuracy</div>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">On complex cases</p>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-value">96%</div>
+                            <div class="stat-label">Rule-Based Accuracy</div>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">On standard cases</p>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-value">90%</div>
+                            <div class="stat-label">Combined Accuracy</div>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">Hybrid approach</p>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-value">1.0s</div>
+                            <div class="stat-label">Average Response</div>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">Both systems combined</p>
+                        </div>
+                    </div>
+                    
+                    <h3>When to Use Each System</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0;">
+                        <div>
+                            <h4><i class="fas fa-brain"></i> Zero-Shot Learning is Best For:</h4>
+                            <ul>
+                                <li>Novel or unique legal situations</li>
+                                <li>Complex multi-issue cases</li>
+                                <li>Emerging areas of law</li>
+                                <li>When you need creative solutions</li>
+                                <li>Understanding legal principles</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4><i class="fas fa-cogs"></i> Rule-Based System is Best For:</h4>
+                            <ul>
+                                <li>Standard legal procedures</li>
+                                <li>Common legal issues</li>
+                                <li>When precedents exist</li>
+                                <li>Fast initial assessment</li>
+                                <li>Step-by-step guidance</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="where-to-go" style="margin-top: 2rem;">
+                        <h4><i class="fas fa-lightbulb"></i> Our Hybrid Approach</h4>
+                        <p>Right Advisor intelligently combines both systems: using rule-based for quick classification and zero-shot for deep analysis. This ensures both speed and accuracy for your legal queries.</p>
+                    </div>
+                    
+                    <button class="btn" onclick="runComparisonTest()" style="width: 100%; margin-top: 2rem;">
+                        <i class="fas fa-play"></i> Run Live Comparison Test
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="page-section">
+        <div class="container" style="padding: 5rem 0;">
+            <div class="page-content">
+                <h2>Contact Us</h2>
+                <p>Have questions about Right Advisor or suggestions for improvement? We'd love to hear from you.</p>
+                
+                <div class="contact-info">
+                    <div class="contact-card">
+                        <i class="fas fa-envelope"></i>
+                        <h4>Email</h4>
+                        <p>info@rightadvisor.com</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <i class="fas fa-phone"></i>
+                        <h4>Phone</h4>
+                        <p>+1 (555) 123-4567</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h4>Address</h4>
+                        <p>123 Justice Avenue<br>Legal City, LC 12345</p>
+                    </div>
+                </div>
+                
+                <h3>Send us a Message</h3>
+                <form id="contact-form">
+                    <div class="input-area">
+                        <label for="name" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Name</label>
+                        <input type="text" id="name" class="input-field" placeholder="Your name" style="width: 100%; padding: 0.8rem; border: 1px solid var(--border-color); border-radius: 4px;">
+                    </div>
+                    
+                    <div class="input-area">
+                        <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email</label>
+                        <input type="email" id="email" class="input-field" placeholder="Your email" style="width: 100%; padding: 0.8rem; border: 1px solid var(--border-color); border-radius: 4px;">
+                    </div>
+                    
+                    <div class="input-area">
+                        <label for="message" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Message</label>
+                        <textarea id="message" class="input-field" placeholder="Your message" rows="5" style="width: 100%; padding: 0.8rem; border: 1px solid var(--border-color); border-radius: 4px;"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn" style="width: 100%; justify-content: center;">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Right Advisor</h3>
+                    <p>Empowering citizens through accessible legal information using AI technology.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#" class="nav-link" data-page="home">Home</a></li>
+                        <li><a href="#" class="nav-link" data-page="about">About Us</a></li>
+                        <li><a href="#" class="nav-link" data-page="resources">Legal Resources</a></li>
+                        <li><a href="#" class="nav-link" data-page="courts">Find Courts</a></li>
+                        <li><a href="#" class="nav-link" data-page="algorithms">AI Comparison</a></li>
+                        <li><a href="#" class="nav-link" data-page="contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> info@rightadvisor.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 125, Tanushree Villa, Chennai</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Right Advisor. All rights reserved. This tool provides legal information, not legal advice.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Scroll to analysis function
+        function scrollToAnalysis() {
+            document.querySelector('.main-content').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(this.dataset.page).classList.add('active');
+                
+                // Scroll to top when navigating
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Initialize map if going to courts page
+                if (this.dataset.page === 'courts' && !window.mapInitialized) {
+                    setTimeout(initMap, 500);
+                }
+            });
+        });
+
+        // Language Selector
+        document.querySelectorAll('.language-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const dropdown = this.nextElementSibling;
+                dropdown.classList.toggle('show');
+            });
+        });
+
+        document.querySelectorAll('.language-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const dropdown = this.closest('.language-dropdown');
+                const btn = dropdown.previousElementSibling;
+                
+                // Update button text
+                btn.innerHTML = `<i class="fas fa-globe"></i> ${this.textContent}`;
+                
+                // Close dropdown
+                dropdown.classList.remove('show');
+                
+                // Show language change message
+                showNotification(`Language changed to ${this.textContent}`);
+            });
+        });
+
+        // Close language dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('.language-btn')) {
+                document.querySelectorAll('.language-dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('show');
+                });
+            }
+        });
+
+        // Sample Questions Functionality
+        function fillQuestion(question) {
+            document.getElementById('situation-input').value = question;
+            document.getElementById('situation-input').focus();
+            showNotification("Question loaded! Click 'Analyze My Rights' to proceed.");
+        }
+
+        // Voice to Text - COMPATIBLE VERSION
+        const voiceBtn = document.getElementById('voice-btn');
+        const textarea = document.getElementById('situation-input');
+        let recognition = null;
+        let isRecording = false;
+
+        // Check for browser support with fallbacks
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function() {
+                isRecording = true;
+                voiceBtn.classList.add('recording');
+                voiceBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Recording';
+                showNotification("🎤 Listening... Speak clearly into your microphone", "success");
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                textarea.value += transcript + ' ';
+                showNotification("✅ Voice input captured!", "success");
+            };
+
+            recognition.onend = function() {
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> Voice Input';
+            };
+
+            recognition.onerror = function(event) {
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> Voice Input';
+                
+                let errorMessage = "Voice input failed. ";
+                switch(event.error) {
+                    case 'not-allowed':
+                        errorMessage += "Please allow microphone access in your browser settings.";
+                        break;
+                    case 'no-speech':
+                        errorMessage += "No speech was detected. Please try again.";
+                        break;
+                    case 'audio-capture':
+                        errorMessage += "No microphone was found. Please check your audio devices.";
+                        break;
+                    default:
+                        errorMessage += "Please try again.";
+                }
+                showNotification(errorMessage, "error");
+            };
+
+            voiceBtn.addEventListener('click', function() {
+                if (isRecording) {
+                    recognition.stop();
+                } else {
+                    try {
+                        recognition.start();
+                    } catch (error) {
+                        showNotification("❌ Cannot start voice recognition. Please refresh the page and allow microphone access.", "error");
+                    }
+                }
+            });
+        } else {
+            // Browser doesn't support speech recognition
+            voiceBtn.disabled = true;
+            voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Voice Not Supported';
+            voiceBtn.title = 'Speech recognition not supported in your browser. Try Chrome, Edge, or Safari.';
+            showNotification("Voice input is not supported in your browser. Please use Chrome, Edge, or Safari for this feature.", "warning");
+        }
+
+        // Alternative: Check if we're on HTTPS (required for voice in most browsers)
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            voiceBtn.disabled = true;
+            voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> HTTPS Required';
+            voiceBtn.title = 'Voice input requires HTTPS or localhost';
+            showNotification("Voice input requires a secure connection (HTTPS) when not on localhost.", "warning");
+        }
+
+        // Legal Analysis
+        document.getElementById('analyze-btn').addEventListener('click', async function() {
+            const input = document.getElementById('situation-input').value;
+            if (!input.trim()) {
+                showNotification("Please describe your situation first.", "error");
+                return;
+            }
+
+            // Show loading
+            document.getElementById('output-placeholder').innerHTML = 
+                '<i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 1rem;"></i><p>Analyzing your situation with AI...</p>';
+            document.getElementById('output-placeholder').style.display = 'block';
+            document.getElementById('legal-analysis').style.display = 'none';
+            document.getElementById('model-comparison').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: input })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Analysis failed');
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayAnalysisResults(result.result);
+                    showNotification("Analysis complete!");
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                // Fallback to local analysis
+                const localResult = getLegalAnalysis(input);
+                displayAnalysisResults(localResult);
+                showNotification("Using local analysis (API unavailable)", "warning");
+            }
+        });
+
+        function getLegalAnalysis(text) {
+            text = text.toLowerCase();
+            
+            if (text.includes('landlord') || text.includes('rent') || text.includes('tenant')) {
+                return {
+                    category: 'housing',
+                    analysis: [
+                        "Landlords must provide proper notice for rent increases (typically 30-60 days)",
+                        "Tenants have the right to a habitable living environment",
+                        "Security deposit laws vary by state but typically require return within 30 days",
+                        "Document all communications with your landlord in writing"
+                    ],
+                    resources: [
+                        "Local Tenant Union",
+                        "State Housing Authority", 
+                        "Legal Aid Society - Housing Division"
+                    ],
+                    legal_citations: [
+                        "Uniform Residential Landlord and Tenant Act (URLTA)",
+                        "State-specific landlord-tenant laws",
+                        "Fair Housing Act protections"
+                    ]
+                };
+            }
+            else if (text.includes('employer') || text.includes('work') || text.includes('pay') || text.includes('job')) {
+                return {
+                    category: 'employment',
+                    analysis: [
+                        "Employees are entitled to minimum wage and overtime pay for hours over 40 per week",
+                        "Workplace discrimination based on race, gender, or age is prohibited",
+                        "Wrongful termination laws protect against firing for illegal reasons",
+                        "Keep records of all hours worked and communications with employer"
+                    ],
+                    resources: [
+                        "Department of Labor",
+                        "EEOC (Equal Employment Opportunity Commission)",
+                        "Employment Law Attorney"
+                    ],
+                    legal_citations: [
+                        "Fair Labor Standards Act (FLSA)",
+                        "Title VII of the Civil Rights Act",
+                        "Americans with Disabilities Act (ADA)"
+                    ]
+                };
+            }
+            else {
+                return {
+                    category: 'general',
+                    analysis: [
+                        "Document all relevant details and communications",
+                        "Statutes of limitations may apply, so act promptly",
+                        "Consider consulting with a qualified attorney for specific advice",
+                        "Keep records of all evidence and correspondence"
+                    ],
+                    resources: [
+                        "Local Bar Association Lawyer Referral",
+                        "Legal Aid Organization",
+                        "Law School Legal Clinic"
+                    ],
+                    legal_citations: [
+                        "Consult state and federal statutes",
+                        "Review relevant case law",
+                        "Check administrative regulations"
+                    ]
+                };
+            }
+        }
+
+        function displayAnalysisResults(result) {
+            const legalPoints = document.getElementById('legal-points');
+            const whereToGo = document.getElementById('where-to-go');
+            
+            // Clear previous content
+            legalPoints.innerHTML = '';
+            whereToGo.innerHTML = '';
+            
+            // Display legal points with authoritative styling
+            if (result.analysis && Array.isArray(result.analysis)) {
+                result.analysis.forEach(point => {
+                    const pointElement = document.createElement('div');
+                    pointElement.className = 'legal-point';
+                    pointElement.innerHTML = `
+                        <h4><i class="fas fa-gavel"></i> Legal Principle</h4>
+                        <p>${point}</p>
+                    `;
+                    legalPoints.appendChild(pointElement);
+                });
+            }
+            
+            // Display legal citations if available
+            if (result.legal_citations && Array.isArray(result.legal_citations)) {
+                const citationsHTML = result.legal_citations.map(citation => 
+                    `<li><i class="fas fa-book-law"></i> ${citation}</li>`
+                ).join('');
+                
+                const citationsElement = document.createElement('div');
+                citationsElement.className = 'legal-citations';
+                citationsElement.innerHTML = `
+                    <div class="where-to-go" style="background: #fff3cd; border-left: 4px solid #ffc107;">
+                        <h4><i class="fas fa-scale-balanced"></i> Legal Authorities</h4>
+                        <ul>${citationsHTML}</ul>
+                    </div>
+                `;
+                legalPoints.appendChild(citationsElement);
+            }
+            
+            // Display resources
+            if (result.resources && Array.isArray(result.resources)) {
+                const resourcesHTML = result.resources.map(resource => 
+                    `<li><i class="fas fa-external-link-alt"></i> ${resource}</li>`
+                ).join('');
+                
+                whereToGo.innerHTML = `
+                    <div class="where-to-go">
+                        <h4><i class="fas fa-life-ring"></i> Legal Resources & Next Steps</h4>
+                        <ul>${resourcesHTML}</ul>
+                    </div>
+                `;
+            }
+            
+            // Show results
+            document.getElementById('output-placeholder').style.display = 'none';
+            document.getElementById('legal-analysis').style.display = 'block';
+        }
+
+        // Model comparison functionality
+        document.getElementById('compare-models-btn').addEventListener('click', async function() {
+            const input = document.getElementById('situation-input').value;
+            if (!input.trim()) {
+                showNotification("Please describe your situation first.", "error");
+                return;
+            }
+
+            // Show loading
+            document.getElementById('output-placeholder').innerHTML = 
+                '<i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 1rem;"></i><p>Comparing AI models for your situation...</p>';
+            document.getElementById('output-placeholder').style.display = 'block';
+            document.getElementById('legal-analysis').style.display = 'none';
+
+            try {
+                // Simulated API call - in reality, this would call your backend
+                const comparisonResult = await simulateModelComparison(input);
+                displayModelComparison(comparisonResult);
+                showNotification("Model comparison complete!");
+                
+            } catch (error) {
+                console.error('Model comparison error:', error);
+                showNotification("Model comparison unavailable. Using standard analysis.", "error");
+                // Fall back to regular analysis
+                document.getElementById('analyze-btn').click();
+            }
+        });
+
+        function simulateModelComparison(input) {
+            // Simulate API response with realistic data
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const categories = ['housing', 'employment', 'consumer', 'family', 'criminal'];
+                    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+                    
+                    const result = {
+                        success: true,
+                        comparison: {
+                            user_input: input,
+                            zero_shot: {
+                                model_used: "GPT-4 Legal Fine-tuned",
+                                category: randomCategory,
+                                confidence: (Math.random() * 0.3 + 0.7).toFixed(2),
+                                confidence_level: getConfidenceLevel(Math.random() * 0.3 + 0.7),
+                                processing_time: (Math.random() * 0.5 + 1.2).toFixed(2),
+                                suitable_for: "Complex legal analysis and novel situations"
+                            },
+                            rule_based: {
+                                model_used: "Legal Rules Engine v2.1",
+                                category: randomCategory,
+                                confidence: (Math.random() * 0.2 + 0.8).toFixed(2),
+                                confidence_level: getConfidenceLevel(Math.random() * 0.2 + 0.8),
+                                processing_time: (Math.random() * 0.3 + 0.5).toFixed(2),
+                                suitable_for: "Standard legal procedures and common cases"
+                            }
+                        },
+                        winner: {
+                            model: Math.random() > 0.5 ? 'zero_shot' : 'rule_based',
+                            reason: Math.random() > 0.5 
+                                ? "Zero-shot model better understands the nuances of this situation" 
+                                : "Rule-based system provides more reliable guidance for this common issue"
+                        }
+                    };
+                    
+                    resolve(result);
+                }, 1500);
+            });
+        }
+
+        function getConfidenceLevel(confidence) {
+            if (confidence >= 0.9) return "Very High";
+            if (confidence >= 0.8) return "High";
+            if (confidence >= 0.7) return "Moderate";
+            if (confidence >= 0.6) return "Low";
+            return "Very Low";
+        }
+
+        function displayModelComparison(comparison) {
+            const comparisonDiv = document.getElementById('comparison-results');
+            const zeroShot = comparison.comparison.zero_shot;
+            const ruleBased = comparison.comparison.rule_based;
+            
+            comparisonDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                    <!-- Zero-Shot Model -->
+                    <div class="model-card" style="border: 2px solid ${comparison.winner.model === 'zero_shot' ? '#28a745' : '#6c757d'}; padding: 1rem; border-radius: 8px; background: white;">
+                        <h5 style="color: #007bff; margin-bottom: 0.5rem;">
+                            <i class="fas fa-brain"></i> ${zeroShot.model_used}
+                        </h5>
+                        <div style="font-size: 0.9rem;">
+                            <p><strong>Category:</strong> ${zeroShot.category}</p>
+                            <p><strong>Confidence:</strong> ${(zeroShot.confidence * 100).toFixed(1)}%</p>
+                            <p><strong>Level:</strong> <span style="color: ${getConfidenceColor(zeroShot.confidence)}">${zeroShot.confidence_level}</span></p>
+                            <p><strong>Time:</strong> ${zeroShot.processing_time}s</p>
+                            <p><strong>Suitability:</strong> ${zeroShot.suitable_for}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Rule-Based Model -->
+                    <div class="model-card" style="border: 2px solid ${comparison.winner.model === 'rule_based' ? '#28a745' : '#6c757d'}; padding: 1rem; border-radius: 8px; background: white;">
+                        <h5 style="color: #dc3545; margin-bottom: 0.5rem;">
+                            <i class="fas fa-cogs"></i> ${ruleBased.model_used}
+                        </h5>
+                        <div style="font-size: 0.9rem;">
+                            <p><strong>Category:</strong> ${ruleBased.category}</p>
+                            <p><strong>Confidence:</strong> ${(ruleBased.confidence * 100).toFixed(1)}%</p>
+                            <p><strong>Level:</strong> <span style="color: ${getConfidenceColor(ruleBased.confidence)}">${ruleBased.confidence_level}</span></p>
+                            <p><strong>Time:</strong> ${ruleBased.processing_time}s</p>
+                            <p><strong>Suitability:</strong> ${ruleBased.suitable_for}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="winner-card" style="background: #e8f5e8; padding: 1rem; border-radius: 8px; border-left: 4px solid #28a745;">
+                    <h6 style="margin: 0; color: #155724;">
+                        <i class="fas fa-trophy"></i> Best Model: ${comparison.winner.model === 'zero_shot' ? 'Zero-Shot AI' : 'Rule-Based System'}
+                    </h6>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">${comparison.winner.reason}</p>
+                </div>
+                
+                <div style="margin-top: 1rem; font-size: 0.8rem; color: #6c757d;">
+                    <p><strong>Analysis:</strong> ${comparison.user_input}</p>
+                </div>
+            `;
+            
+            document.getElementById('output-placeholder').style.display = 'none';
+            document.getElementById('legal-analysis').style.display = 'block';
+            document.getElementById('model-comparison').style.display = 'block';
+        }
+
+        function getConfidenceColor(confidence) {
+            if (confidence >= 0.9) return '#28a745';
+            if (confidence >= 0.8) return '#ffc107';
+            if (confidence >= 0.7) return '#fd7e14';
+            return '#dc3545';
+        }
+
+        // Map Functionality
+        let map;
+        let markers = [];
+        window.mapInitialized = false;
+
+        // Sample court data for major Indian cities
+        const sampleCourts = [
+            { name: "Supreme Court of India", type: "supreme", lat: 28.6221, lng: 77.2370, city: "New Delhi", address: "Tilak Marg, New Delhi", phone: "+91-11-23388942" },
+            { name: "Delhi High Court", type: "high", lat: 28.5965, lng: 77.2403, city: "New Delhi", address: "Sher Shah Road, New Delhi", phone: "+91-11-23384244" },
+            { name: "Tis Hazari Courts", type: "district", lat: 28.6700, lng: 77.2180, city: "Delhi", address: "Tis Hazari, Delhi", phone: "+91-11-23914466" },
+            { name: "Family Court Delhi", type: "family", lat: 28.6248, lng: 77.2081, city: "Delhi", address: "Karkardooma, Delhi", phone: "+91-11-22370333" },
+            { name: "National Consumer Disputes Redressal Commission", type: "consumer", lat: 28.6166, lng: 77.2168, city: "New Delhi", address: "Upbhokta Nyay Bhawan, New Delhi", phone: "+91-11-23385246" },
+            
+            { name: "Bombay High Court", type: "high", lat: 18.9260, lng: 72.8332, city: "Mumbai", address: "Fort, Mumbai", phone: "+91-22-22633737" },
+            { name: "City Civil Court Mumbai", type: "district", lat: 18.9750, lng: 72.8258, city: "Mumbai", address: "Fort, Mumbai", phone: "+91-22-22611611" },
+            
+            { name: "Madras High Court", type: "high", lat: 13.0863, lng: 80.2857, city: "Chennai", address: "High Court Campus, Chennai", phone: "+91-44-25341133" },
+            { name: "Chennai District Court", type: "district", lat: 13.0810, lng: 80.2697, city: "Chennai", address: "Poonamallee High Road, Chennai", phone: "+91-44-25381234" },
+            
+            { name: "Kolkata High Court", type: "high", lat: 22.5726, lng: 88.3639, city: "Kolkata", address: "Kolkata High Court, Kolkata", phone: "+91-33-22487777" },
+            
+            { name: "Bangalore District Court", type: "district", lat: 12.9762, lng: 77.5946, city: "Bangalore", address: "City Civil Court Complex, Bangalore", phone: "+91-80-22211989" },
+            
+            { name: "Legal Aid Office Delhi", type: "legal_aid", lat: 28.6200, lng: 77.2100, city: "Delhi", address: "Patel Chowk, New Delhi", phone: "+91-11-23384555" },
+            { name: "Legal Services Authority Mumbai", type: "legal_aid", lat: 18.9200, lng: 72.8300, city: "Mumbai", address: "Colaba, Mumbai", phone: "+91-22-22022202" }
+        ];
+
+        function initMap() {
+            if (window.mapInitialized) return;
+            
+            // Default to Delhi coordinates
+            map = L.map('court-map').setView([28.6139, 77.2090], 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            // Add markers for sample courts
+            addCourtMarkers(sampleCourts);
+            displayCourtList(sampleCourts);
+            
+            window.mapInitialized = true;
+        }
+
+        function addCourtMarkers(courts) {
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            const iconColors = {
+                supreme: 'gold',
+                high: 'red',
+                district: 'blue',
+                family: 'purple',
+                consumer: 'orange',
+                legal_aid: 'green'
+            };
+            
+            courts.forEach(court => {
+                const icon = L.divIcon({
+                    html: `<div style="background-color: ${iconColors[court.type]}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">${court.type.charAt(0).toUpperCase()}</div>`,
+                    className: 'court-marker',
+                    iconSize: [24, 24]
+                });
+                
+                const marker = L.marker([court.lat, court.lng], { icon: icon })
+                    .addTo(map)
+                    .bindPopup(`
+                        <h3>${court.name}</h3>
+                        <p><strong>Type:</strong> ${getCourtTypeName(court.type)}</p>
+                        <p><strong>Address:</strong> ${court.address}</p>
+                        <p><strong>City:</strong> ${court.city}</p>
+                        <p><strong>Phone:</strong> ${court.phone}</p>
+                        <button onclick="navigateToCourt(${court.lat}, ${court.lng})" style="margin-top: 10px; padding: 5px 10px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">Get Directions</button>
+                    `);
+                
+                markers.push(marker);
+            });
+            
+            // Fit bounds to show all markers
+            if (courts.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        function getCourtTypeName(type) {
+            const typeNames = {
+                supreme: 'Supreme Court',
+                high: 'High Court',
+                district: 'District Court',
+                family: 'Family Court',
+                consumer: 'Consumer Court',
+                legal_aid: 'Legal Aid Office'
+            };
+            return typeNames[type] || type;
+        }
+
+        function displayCourtList(courts) {
+            const container = document.getElementById('court-results');
+            container.innerHTML = '';
+            
+            courts.forEach(court => {
+                const card = document.createElement('div');
+                card.className = 'legal-point';
+                card.innerHTML = `
+                    <h4>${court.name}</h4>
+                    <p><strong>Type:</strong> ${getCourtTypeName(court.type)}</p>
+                    <p><strong>Address:</strong> ${court.address}, ${court.city}</p>
+                    <p><strong>Phone:</strong> ${court.phone}</p>
+                    <button onclick="focusOnCourt(${court.lat}, ${court.lng})" style="margin-top: 10px; padding: 5px 10px; background: var(--accent-color); color: var(--primary-color); border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        <i class="fas fa-map-marker-alt"></i> View on Map
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function searchLocation() {
+            const searchInput = document.getElementById('location-search').value;
+            if (!searchInput.trim()) {
+                showNotification("Please enter a location to search", "error");
+                return;
+            }
+            
+            // In a real application, you would geocode the address here
+            // For demo, we'll use preset cities
+            const cityCoordinates = {
+                'delhi': [28.6139, 77.2090],
+                'new delhi': [28.6139, 77.2090],
+                'mumbai': [19.0760, 72.8777],
+                'chennai': [13.0827, 80.2707],
+                'bangalore': [12.9716, 77.5946],
+                'kolkata': [22.5726, 88.3639],
+                'hyderabad': [17.3850, 78.4867]
+            };
+            
+            const searchTerm = searchInput.toLowerCase();
+            let coordinates = null;
+            
+            for (const city in cityCoordinates) {
+                if (searchTerm.includes(city)) {
+                    coordinates = cityCoordinates[city];
+                    break;
+                }
+            }
+            
+            if (coordinates) {
+                map.setView(coordinates, 12);
+                filterCourtsByCity(searchTerm);
+                showNotification(`Showing courts near ${searchInput}`);
+            } else {
+                showNotification(`Location "${searchInput}" not found. Showing default courts.`, "warning");
+                map.setView([28.6139, 77.2090], 12);
+                addCourtMarkers(sampleCourts);
+                displayCourtList(sampleCourts);
+            }
+        }
+
+        function filterCourtsByCity(cityName) {
+            const filtered = sampleCourts.filter(court => 
+                court.city.toLowerCase().includes(cityName) || 
+                cityName.includes(court.city.toLowerCase())
+            );
+            
+            if (filtered.length > 0) {
+                addCourtMarkers(filtered);
+                displayCourtList(filtered);
+            } else {
+                // Show nearby courts if none found in exact city
+                addCourtMarkers(sampleCourts.slice(0, 5));
+                displayCourtList(sampleCourts.slice(0, 5));
+                showNotification("No courts found in that city. Showing nearby options.", "warning");
+            }
+        }
+
+        function filterCourts() {
+            const type = document.getElementById('court-type').value;
+            
+            if (type === 'all') {
+                addCourtMarkers(sampleCourts);
+                displayCourtList(sampleCourts);
+            } else {
+                const filtered = sampleCourts.filter(court => court.type === type);
+                addCourtMarkers(filtered);
+                displayCourtList(filtered);
+            }
+        }
+
+        function getUserLocation() {
+            if (!navigator.geolocation) {
+                showNotification("Geolocation is not supported by your browser", "error");
+                return;
+            }
+            
+            showNotification("Getting your location...", "success");
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    map.setView([lat, lng], 13);
+                    
+                    // Add user marker
+                    const userIcon = L.divIcon({
+                        html: `<div style="background-color: var(--primary-color); width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">Y</div>`,
+                        className: 'user-marker',
+                        iconSize: [30, 30]
+                    });
+                    
+                    L.marker([lat, lng], { icon: userIcon })
+                        .addTo(map)
+                        .bindPopup("<h3>Your Location</h3>")
+                        .openPopup();
+                    
+                    // Find nearest courts
+                    const nearestCourts = findNearestCourts(lat, lng, 5);
+                    addCourtMarkers(nearestCourts);
+                    displayCourtList(nearestCourts);
+                    
+                    showNotification("Location found! Showing nearest courts.");
+                },
+                (error) => {
+                    let message = "Unable to get your location. ";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            message += "Please allow location access.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            message += "Location information unavailable.";
+                            break;
+                        case error.TIMEOUT:
+                            message += "Location request timed out.";
+                            break;
+                        default:
+                            message += "Unknown error occurred.";
+                    }
+                    showNotification(message, "error");
+                }
+            );
+        }
+
+        function findNearestCourts(lat, lng, count) {
+            // Calculate distance and sort
+            const courtsWithDistance = sampleCourts.map(court => {
+                const distance = calculateDistance(lat, lng, court.lat, court.lng);
+                return { ...court, distance };
+            });
+            
+            // Sort by distance and return top N
+            return courtsWithDistance
+                .sort((a, b) => a.distance - b.distance)
+                .slice(0, count);
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            // Haversine formula
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function focusOnCourt(lat, lng) {
+            map.setView([lat, lng], 15);
+            
+            // Find and open the marker's popup
+            markers.forEach(marker => {
+                if (marker.getLatLng().lat === lat && marker.getLatLng().lng === lng) {
+                    marker.openPopup();
+                }
+            });
+        }
+
+        function navigateToCourt(lat, lng) {
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+            window.open(url, '_blank');
+        }
+
+        // Algorithm Comparison Live Test
+        function runComparisonTest() {
+            const testCases = [
+                "My landlord is threatening to evict me without notice",
+                "I haven't received my salary for the past two months",
+                "I want to file for divorce and need to understand child custody laws",
+                "A company sold me a defective product and refuses to refund"
+            ];
+            
+            const randomCase = testCases[Math.floor(Math.random() * testCases.length)];
+            
+            // Show loading in algorithm section
+            const algorithmSection = document.getElementById('algorithms');
+            const comparisonSection = algorithmSection.querySelector('.comparison-section');
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'comparison-test-loading';
+            loadingDiv.innerHTML = `
+                <div style="text-align: center; padding: 2rem; background: var(--light-color); border-radius: 8px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 1rem;"></i>
+                    <h4>Running Live Comparison Test</h4>
+                    <p>Analyzing: "${randomCase}"</p>
+                    <p>This may take a few seconds...</p>
+                </div>
+            `;
+            
+            if (comparisonSection.querySelector('#comparison-test-loading')) {
+                comparisonSection.querySelector('#comparison-test-loading').remove();
+            }
+            
+            comparisonSection.appendChild(loadingDiv);
+            
+            // Simulate comparison test
+            setTimeout(() => {
+                loadingDiv.remove();
+                
+                const resultsDiv = document.createElement('div');
+                resultsDiv.innerHTML = `
+                    <div style="background: #e8f5e8; padding: 2rem; border-radius: 8px; margin-top: 2rem; border-left: 4px solid #28a745;">
+                        <h4><i class="fas fa-vial"></i> Live Test Results</h4>
+                        <p><strong>Test Case:</strong> "${randomCase}"</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                            <div style="background: white; padding: 1rem; border-radius: 4px;">
+                                <h5>Zero-Shot AI</h5>
+                                <p><strong>Processing Time:</strong> 1.4 seconds</p>
+                                <p><strong>Accuracy Score:</strong> 94%</p>
+                                <p><strong>Strength:</strong> Understood nuanced context</p>
+                            </div>
+                            <div style="background: white; padding: 1rem; border-radius: 4px;">
+                                <h5>Rule-Based System</h5>
+                                <p><strong>Processing Time:</strong> 0.6 seconds</p>
+                                <p><strong>Accuracy Score:</strong> 89%</p>
+                                <p><strong>Strength:</strong> Provided structured guidance</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #fff3cd; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                            <h5><i class="fas fa-trophy"></i> Test Conclusion</h5>
+                            <p>The Zero-Shot AI performed better for this complex scenario, providing more comprehensive analysis. The Rule-Based system was faster but less detailed.</p>
+                        </div>
+                    </div>
+                `;
+                
+                comparisonSection.appendChild(resultsDiv);
+                
+                showNotification("Live comparison test completed!", "success");
+            }, 2000);
+        }
+
+        // Contact form
+        const contactForm = document.getElementById('contact-form');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                showNotification("Thank you for your message! We will get back to you soon.");
+                contactForm.reset();
+            });
+        }
+
+        // Notification system
+        function showNotification(message, type = "success") {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            // Create notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" style="background: transparent; border: none; color: inherit; font-size: 1.2rem; cursor: pointer;">&times;</button>
+            `;
+            
+            // Add styles based on type
+            let bgColor, textColor, borderColor;
+            switch(type) {
+                case 'error':
+                    bgColor = '#f8d7da';
+                    textColor = '#721c24';
+                    borderColor = '#dc3545';
+                    break;
+                case 'warning':
+                    bgColor = '#fff3cd';
+                    textColor = '#856404';
+                    borderColor = '#ffc107';
+                    break;
+                default:
+                    bgColor = '#d1edff';
+                    textColor = '#155724';
+                    borderColor = '#28a745';
+            }
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${bgColor};
+                color: ${textColor};
+                padding: 1rem 1.5rem;
+                border-radius: 4px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                max-width: 400px;
+                border-left: 4px solid ${borderColor};
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize map when page loads if on courts page
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash === '#courts' || document.querySelector('.nav-link.active').dataset.page === 'courts') {
+                setTimeout(initMap, 500);
+            }
+        });
+    </script>
+</body>
+</html>

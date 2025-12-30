@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Right Advisor - Live Document Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Document Panel */
+        .document-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-header {
+            background: #1a365d;
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .panel-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .panel-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .panel-content {
+            padding: 2rem;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .toggle-section h3 {
+            color: #1a365d;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .toggle-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.2rem;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-item:hover {
+            background: #f0f2f5;
+            transform: translateY(-2px);
+        }
+
+        .toggle-info {
+            flex: 1;
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-description {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #d4af37;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+
+        .toggle-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #666;
+            width: 60px;
+            text-align: center;
+        }
+
+        /* Document Types */
+        .document-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .document-type-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .document-type-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .document-type-card.active {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .document-type-icon {
+            font-size: 2.5rem;
+            color: #d4af37;
+            margin-bottom: 1rem;
+        }
+
+        /* Input Fields */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        /* Preview Section */
+        .preview-section {
+            margin-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 2rem;
+        }
+
+        .preview-container {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #d4af37;
+            color: #1a365d;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #e6c12e;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #1a365d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2d4a7c;
+        }
+
+        /* Generator Status */
+        .generator-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem;
+            background: #e8f4fd;
+            border-radius: 6px;
+            margin-top: 1rem;
+            border-left: 4px solid #2196f3;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toggle-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .toggle-status {
+                align-self: flex-end;
+            }
+
+            .preview-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .document-types {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Live Document Generator Panel -->
+        <div class="document-panel">
+            <div class="panel-header">
+                <h2>
+                    <i class="fas fa-file-contract"></i>
+                    Live Document Generator
+                </h2>
+                <div class="panel-actions">
+                    <button class="panel-action-btn" onclick="resetSettings()">
+                        <i class="fas fa-redo"></i>
+                        Reset Settings
+                    </button>
+                    <button class="panel-action-btn" onclick="hidePanel()">
+                        <i class="fas fa-eye-slash"></i>
+                        Hide Panel
+                    </button>
+                </div>
+            </div>
+
+            <div class="panel-content">
+                <!-- Document Type Selection -->
+                <div class="toggle-section">
+                    <h3><i class="fas fa-file-alt"></i> Choose Document Type</h3>
+                    <div class="document-types">
+                        <div class="document-type-card active" data-type="legal-notice" onclick="selectDocumentType('legal-notice')">
+                            <div class="document-type-icon">
+                                <i class="fas fa-gavel"></i>
+                            </div>
+                            <h4>Legal Notice</h4>
+                            <p>Formal notice before legal action</p>
+                        </div>
+                        <div class="document-type-card" data-type="rental-agreement" onclick="selectDocumentType('rental-agreement')">
+                            <div class="document-type-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <h4>Rental Agreement</h4>
+                            <p>Landlord-tenant contract</p>
+                        </div>
+                        <div class="document-type-card" data-type="employment-contract" onclick="selectDocumentType('employment-contract')">
+                            <div class="document-type-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h4>Employment Contract</h4>
+                            <p>Work agreement terms</p>
+                        </div>
+                        <div class="document-type-card" data-type="consumer-complaint" onclick="selectDocumentType('consumer-complaint')">
+                            <div class="document-type-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <h4>Consumer Complaint</h4>
+                            <p>Formal complaint to seller</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document Customization Toggles -->
+                <div class="toggle-section">
+                    <h3><i class="fas fa-sliders-h"></i> Document Settings</h3>
+                    <div class="toggle-grid">
+                        <!-- Toggle 1 -->
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <div class="toggle-label">
+                                    <i class="fas fa-language"></i>
+                                    Regional Language Support
+                                </div>
+                                <div class="toggle-description">
+                                    Generate document in regional language with legal terminology
+                                </div>
+                            </div>
+                            <div class="toggle-status" id="regional-status">OFF</div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-regional" onchange="toggleSetting('regional')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Toggle 2 -->
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <div class="toggle-label">
+                                    <i class="fas fa-balance-scale"></i>
+                                    Include Legal Citations
+                                </div>
+                                <div class="toggle-description">
+                                    Add relevant law references and case precedents
+                                </div>
+                            </div>
+                            <div class="toggle-status" id="citations-status">ON</div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-citations" checked onchange="toggleSetting('citations')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Toggle 3 -->
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <div class="toggle-label">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Privacy Protection Mode
+                                </div>
+                                <div class="toggle-description">
+                                    Replace personal details with placeholders for security
+                                </div>
+                            </div>
+                            <div class="toggle-status" id="privacy-status">OFF</div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-privacy" onchange="toggleSetting('privacy')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Toggle 4 -->
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <div class="toggle-label">
+                                    <i class="fas fa-robot"></i>
+                                    AI-Enhanced Language
+                                </div>
+                                <div class="toggle-description">
+                                    Use AI to optimize legal phrasing and tone
+                                </div>
+                            </div>
+                            <div class="toggle-status" id="ai-status">ON</div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-ai" checked onchange="toggleSetting('ai')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document Details Input -->
+                <div class="toggle-section">
+                    <h3><i class="fas fa-edit"></i> Document Details</h3>
+                    <div class="input-group">
+                        <label for="document-title"><i class="fas fa-heading"></i> Document Title</label>
+                        <input type="text" id="document-title" class="input-field" placeholder="Enter document title" oninput="updateDocument()">
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="input-group">
+                            <label for="sender-name"><i class="fas fa-user"></i> Your Name</label>
+                            <input type="text" id="sender-name" class="input-field" placeholder="Sender's name" oninput="updateDocument()">
+                        </div>
+                        <div class="input-group">
+                            <label for="recipient-name"><i class="fas fa-user-tie"></i> Recipient Name</label>
+                            <input type="text" id="recipient-name" class="input-field" placeholder="Recipient's name" oninput="updateDocument()">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="document-details"><i class="fas fa-info-circle"></i> Case Details</label>
+                        <textarea id="document-details" class="input-field" rows="3" placeholder="Describe the situation or terms..." oninput="updateDocument()"></textarea>
+                    </div>
+                </div>
+
+                <!-- Live Preview Section -->
+                <div class="preview-section">
+                    <h3><i class="fas fa-eye"></i> Live Document Preview</h3>
+                    
+                    <div class="generator-status" id="generator-status">
+                        <i class="fas fa-sync-alt fa-spin"></i>
+                        <span>Document is updating in real-time...</span>
+                    </div>
+
+                    <div class="preview-container" id="document-preview">
+                        <!-- Document will be generated here -->
+                        <div style="text-align: center; padding: 4rem 2rem; color: #666;">
+                            <i class="fas fa-file-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <h3>Your Document Preview</h3>
+                            <p>Fill in the details above to see the live document generation</p>
+                        </div>
+                    </div>
+
+                    <div class="preview-actions">
+                        <button class="btn" onclick="downloadDocument()">
+                            <i class="fas fa-download"></i>
+                            Download Document (PDF)
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyToClipboard()">
+                            <i class="fas fa-copy"></i>
+                            Copy to Clipboard
+                        </button>
+                        <button class="btn btn-secondary" onclick="emailDocument()">
+                            <i class="fas fa-envelope"></i>
+                            Email Document
+                        </button>
+                        <button class="btn btn-secondary" onclick="printDocument()">
+                            <i class="fas fa-print"></i>
+                            Print Document
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Current document type
+        let currentDocumentType = 'legal-notice';
+        let settings = {
+            regional: false,
+            citations: true,
+            privacy: false,
+            ai: true
+        };
+
+        // Select Document Type
+        function selectDocumentType(type) {
+            currentDocumentType = type;
+            
+            // Update active card
+            document.querySelectorAll('.document-type-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('active');
+            
+            // Update document
+            updateDocument();
+        }
+
+        // Toggle Settings
+        function toggleSetting(setting) {
+            const checkbox = document.getElementById(`toggle-${setting}`);
+            const status = document.getElementById(`${setting}-status`);
+            
+            settings[setting] = checkbox.checked;
+            status.textContent = checkbox.checked ? 'ON' : 'OFF';
+            
+            updateDocument();
+        }
+
+        // Update Document Preview
+        function updateDocument() {
+            const status = document.getElementById('generator-status');
+            status.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i><span>Updating document...</span>';
+            
+            // Simulate processing time
+            setTimeout(() => {
+                generateDocumentContent();
+                status.innerHTML = '<i class="fas fa-check-circle" style="color: #28a745;"></i><span>Document updated successfully</span>';
+                
+                // Hide status after 2 seconds
+                setTimeout(() => {
+                    status.style.opacity = '0';
+                    setTimeout(() => {
+                        status.style.display = 'none';
+                    }, 300);
+                }, 2000);
+            }, 500);
+        }
+
+        // Generate Document Content
+        function generateDocumentContent() {
+            const title = document.getElementById('document-title').value || 'Untitled Document';
+            const sender = document.getElementById('sender-name').value || '[Your Name]';
+            const recipient = document.getElementById('recipient-name').value || '[Recipient Name]';
+            const details = document.getElementById('document-details').value || '[Case details will appear here]';
+            
+            let documentContent = '';
+            
+            // Document header
+            documentContent += `
+                <div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid #1a365d;">
+                    <h1 style="color: #1a365d; margin-bottom: 0.5rem;">${title}</h1>
+                    <p style="color: #666; font-size: 0.9rem;">Generated by Right Advisor • ${new Date().toLocaleDateString()}</p>
+                </div>
+            `;
+            
+            // Document type specific content
+            switch(currentDocumentType) {
+                case 'legal-notice':
+                    documentContent += generateLegalNotice(sender, recipient, details);
+                    break;
+                case 'rental-agreement':
+                    documentContent += generateRentalAgreement(sender, recipient, details);
+                    break;
+                case 'employment-contract':
+                    documentContent += generateEmploymentContract(sender, recipient, details);
+                    break;
+                case 'consumer-complaint':
+                    documentContent += generateConsumerComplaint(sender, recipient, details);
+                    break;
+            }
+            
+            // Add settings-based content
+            if (settings.citations) {
+                documentContent += `
+                    <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-left: 4px solid #1a365d;">
+                        <h4><i class="fas fa-book-law"></i> Legal References</h4>
+                        <ul style="margin-left: 1.5rem;">
+                            <li>Indian Contract Act, 1872</li>
+                            <li>Consumer Protection Act, 2019</li>
+                            <li>Relevant State-specific regulations</li>
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            documentContent += `
+                <div style="margin-top: 2rem; padding: 1rem; background: #fff3cd; border-radius: 4px; border-left: 4px solid #ffc107;">
+                    <p><strong>Disclaimer:</strong> This document is generated for informational purposes only and does not constitute legal advice. For specific legal concerns, please consult with a qualified attorney.</p>
+                </div>
+            `;
+            
+            document.getElementById('document-preview').innerHTML = documentContent;
+            
+            // Show status again
+            const status = document.getElementById('generator-status');
+            status.style.display = 'flex';
+            status.style.opacity = '1';
+        }
+
+        // Document Templates
+        function generateLegalNotice(sender, recipient, details) {
+            return `
+                <div style="line-height: 1.8;">
+                    <p><strong>FROM:</strong> ${sender}</p>
+                    <p><strong>TO:</strong> ${recipient}</p>
+                    <p><strong>DATE:</strong> ${new Date().toLocaleDateString()}</p>
+                    
+                    <div style="margin: 2rem 0;">
+                        <p><strong>SUBJECT: LEGAL NOTICE</strong></p>
+                        
+                        <p>Dear Sir/Madam,</p>
+                        
+                        <p>This notice is served upon you under the relevant provisions of law governing the matter.</p>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                            <strong>MATTER OF DISPUTE:</strong><br>
+                            ${details}
+                        </div>
+                        
+                        <p>You are hereby called upon to:</p>
+                        <ol style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                            <li>Cease and desist from the aforementioned actions immediately</li>
+                            <li>Provide appropriate compensation/damages</li>
+                            <li>Respond to this notice within 30 days</li>
+                        </ol>
+                        
+                        <p>Failure to comply will compel me to initiate appropriate legal proceedings against you, for which you shall be solely liable for all costs and consequences.</p>
+                        
+                        <p>Please treat this notice with the seriousness it deserves.</p>
+                    </div>
+                    
+                    <p>Yours sincerely,</p>
+                    <p><strong>${sender}</strong></p>
+                </div>
+            `;
+        }
+
+        function generateRentalAgreement(sender, recipient, details) {
+            return `
+                <div style="line-height: 1.8;">
+                    <h3 style="color: #1a365d; margin-bottom: 1rem;">RENTAL AGREEMENT</h3>
+                    
+                    <p>This Rental Agreement is made on ${new Date().toLocaleDateString()} between:</p>
+                    
+                    <p><strong>LANDLORD:</strong> ${sender}</p>
+                    <p><strong>TENANT:</strong> ${recipient}</p>
+                    
+                    <div style="margin: 1.5rem 0;">
+                        <h4>TERMS AND CONDITIONS</h4>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                            <strong>PROPERTY DETAILS:</strong><br>
+                            ${details}
+                        </div>
+                        
+                        <p><strong>1. RENT:</strong> Monthly rent shall be paid by the 5th of each month.</p>
+                        <p><strong>2. SECURITY DEPOSIT:</strong> Equivalent to two months' rent.</p>
+                        <p><strong>3. DURATION:</strong> This agreement is valid for 11 months from the date of signing.</p>
+                        <p><strong>4. MAINTENANCE:</strong> Landlord is responsible for structural repairs.</p>
+                        <p><strong>5. UTILITIES:</strong> Tenant shall pay for all utilities consumed.</p>
+                        <p><strong>6. NOTICE PERIOD:</strong> 30 days notice required for termination.</p>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <p>_________________________</p>
+                            <p><strong>LANDLORD</strong><br>${sender}</p>
+                        </div>
+                        <div>
+                            <p>_________________________</p>
+                            <p><strong>TENANT</strong><br>${recipient}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateEmploymentContract(sender, recipient, details) {
+            return `
+                <div style="line-height: 1.8;">
+                    <h3 style="color: #1a365d; margin-bottom: 1rem;">EMPLOYMENT AGREEMENT</h3>
+                    
+                    <p>This Employment Agreement is made on ${new Date().toLocaleDateString()} between:</p>
+                    
+                    <p><strong>EMPLOYER:</strong> ${sender}</p>
+                    <p><strong>EMPLOYEE:</strong> ${recipient}</p>
+                    
+                    <div style="margin: 1.5rem 0;">
+                        <h4>TERMS OF EMPLOYMENT</h4>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                            <strong>POSITION DETAILS:</strong><br>
+                            ${details}
+                        </div>
+                        
+                        <p><strong>1. POSITION:</strong> As described above.</p>
+                        <p><strong>2. COMPENSATION:</strong> As per company policy and applicable laws.</p>
+                        <p><strong>3. WORK HOURS:</strong> Standard 40-hour work week.</p>
+                        <p><strong>4. LEAVE POLICY:</strong> As per company policy and statutory requirements.</p>
+                        <p><strong>5. CONFIDENTIALITY:</strong> Employee shall maintain confidentiality of company information.</p>
+                        <p><strong>6. TERMINATION:</strong> As per notice period specified.</p>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <p>_________________________</p>
+                            <p><strong>EMPLOYER</strong><br>${sender}</p>
+                        </div>
+                        <div>
+                            <p>_________________________</p>
+                            <p><strong>EMPLOYEE</strong><br>${recipient}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateConsumerComplaint(sender, recipient, details) {
+            return `
+                <div style="line-height: 1.8;">
+                    <h3 style="color: #1a365d; margin-bottom: 1rem;">CONSUMER COMPLAINT</h3>
+                    
+                    <p><strong>FROM:</strong> ${sender}</p>
+                    <p><strong>TO:</strong> ${recipient}</p>
+                    <p><strong>DATE:</strong> ${new Date().toLocaleDateString()}</p>
+                    
+                    <div style="margin: 1.5rem 0;">
+                        <p><strong>SUBJECT: FORMAL COMPLAINT REGARDING DEFECTIVE PRODUCT/SERVICE</strong></p>
+                        
+                        <p>Dear Sir/Madam,</p>
+                        
+                        <p>I am writing to formally complain about the following issue:</p>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                            <strong>COMPLAINT DETAILS:</strong><br>
+                            ${details}
+                        </div>
+                        
+                        <p>This constitutes a violation of my consumer rights under the Consumer Protection Act, 2019.</p>
+                        
+                        <p>I request you to:</p>
+                        <ol style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                            <li>Resolve this issue immediately</li>
+                            <li>Provide appropriate compensation</li>
+                            <li>Respond within 7 working days</li>
+                        </ol>
+                        
+                        <p>Failure to resolve this matter will force me to escalate this complaint to the appropriate consumer forum and seek legal remedies.</p>
+                    </div>
+                    
+                    <p>Sincerely,</p>
+                    <p><strong>${sender}</strong></p>
+                </div>
+            `;
+        }
+
+        // Panel Actions
+        function resetSettings() {
+            // Reset all toggles
+            document.querySelectorAll('.toggle-switch input').forEach(input => {
+                input.checked = false;
+            });
+            document.getElementById('toggle-citations').checked = true;
+            document.getElementById('toggle-ai').checked = true;
+            
+            // Reset status labels
+            document.querySelectorAll('.toggle-status').forEach(status => {
+                status.textContent = 'OFF';
+            });
+            document.getElementById('citations-status').textContent = 'ON';
+            document.getElementById('ai-status').textContent = 'ON';
+            
+            // Reset settings object
+            settings = {
+                regional: false,
+                citations: true,
+                privacy: false,
+                ai: true
+            };
+            
+            // Reset input fields
+            document.getElementById('document-title').value = '';
+            document.getElementById('sender-name').value = '';
+            document.getElementById('recipient-name').value = '';
+            document.getElementById('document-details').value = '';
+            
+            // Reset document type
+            selectDocumentType('legal-notice');
+            
+            // Show confirmation
+            showNotification('All settings have been reset to default');
+        }
+
+        function hidePanel() {
+            const panel = document.querySelector('.document-panel');
+            panel.style.transform = 'translateY(-20px)';
+            panel.style.opacity = '0';
+            setTimeout(() => {
+                panel.style.display = 'none';
+                showNotification('Document panel hidden. Refresh page to restore.');
+            }, 300);
+        }
+
+        // Document Actions
+        function downloadDocument() {
+            showNotification('Downloading document as PDF...', 'success');
+            // In real implementation, this would generate and download PDF
+            setTimeout(() => {
+                showNotification('Document downloaded successfully!', 'success');
+            }, 1500);
+        }
+
+        function copyToClipboard() {
+            const preview = document.getElementById('document-preview').innerText;
+            navigator.clipboard.writeText(preview)
+                .then(() => showNotification('Document copied to clipboard!', 'success'))
+                .catch(() => showNotification('Failed to copy document', 'error'));
+        }
+
+        function emailDocument() {
+            showNotification('Opening email client with document attached...', 'info');
+        }
+
+        function printDocument() {
+            window.print();
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : '#d1edff'};
+                color: ${type === 'success' ? '#155724' : type === 'error' ? '#721c24' : '#0c5460'};
+                padding: 1rem 1.5rem;
+                border-radius: 6px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideIn 0.3s ease;
+                border-left: 4px solid ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize document on load
+        document.addEventListener('DOMContentLoaded', () => {
+            generateDocumentContent();
+            
+            // Add CSS for animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateY(100%); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateY(0); opacity: 1; }
+                    to { transform: translateY(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
